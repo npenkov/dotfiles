@@ -1,0 +1,296 @@
+export LC_ALL=en_US.UTF-8 export LANG=en_US.UTF-8
+export ZSH=~/.oh-my-zsh
+
+ZSH_THEME="robbyrussell"
+# plugins=(git git-flow colorize adb archlinux encode64 fasd osx mvn gradle docker docker-compose aws sublime vagrant kubectl kube-ps1 golang gradle node npm pip vscode yarn zsh-navigation-tools terraform sudo python postgres pass npx man helm )
+
+#  Intallations:
+#   git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
+#   git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+
+plugins=(
+  git 
+  kube-ps1 
+  kubectl 
+  node 
+  npm 
+  zsh-navigation-tools 
+  helm 
+  docker 
+  aws 
+  zsh-syntax-highlighting 
+  golang 
+  zsh-navigation-tools 
+  zsh-autosuggestions)
+
+source $ZSH/oh-my-zsh.sh
+
+# User configuration
+export MAC_THEME=$(defaults read -g AppleInterfaceStyle 2>/dev/null)
+export MANPATH="/usr/local/man:$MANPATH"
+
+# alias ranger='ranger --choosedir=$HOME/.rangerdir; LASTDIR=`cat $HOME/.rangerdir`; cd "$LASTDIR"'
+
+function pgrep {
+    PID=`ps -ef | grep -v grep | grep "$1"| cut -d' ' -f2`
+    echo $PID
+}
+
+function gitdiff2 {
+  rev=$1
+  # echo "git diff $rev^1..$rev"
+  git diff "$rev"^1.."$rev"
+}
+
+function fed {
+	RED='\033[0;31m'
+	NC='\033[0m' # No Color
+	for fold in `find . -maxdepth 1 -type d -not -name '\.*'`;
+	do
+		cd $fold;
+		echo -e "${RED}Exec in: $fold${NC}";
+		eval "$@";
+		cd ..;
+	done
+}
+
+function cpstat()
+{
+  local pid="${1:-$(pgrep -xn cp)}" src dst
+  [[ "$pid" ]] || return
+  while [[ -f "/proc/$pid/fd/3" ]]; do
+    read src dst < <(stat -L --printf '%s ' "/proc/$pid/fd/"{3,4})
+    (( src )) || break
+    printf 'cp %d%%\r' $((dst*100/src))
+    sleep 1
+  done
+  echo
+}
+
+function assume_role() {
+    unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_SECURITY_TOKEN
+    echo "AWS_PROFILE=$AWS_PROFILE"
+    echo "Assuming role arn:aws:iam::${1}:role/${2}"
+    temporary_credentials=$(aws sts assume-role --role-arn="arn:aws:iam::${1}:role/${2}" --role-session-name="sh")
+
+    unset AWS_PROFILE AWS_DEFAULT_PROFILE
+
+    export AWS_ACCESS_KEY_ID=$(echo "${temporary_credentials}" | jq -re '.Credentials.AccessKeyId')
+    export AWS_SECRET_ACCESS_KEY=$(echo "${temporary_credentials}" | jq -re '.Credentials.SecretAccessKey')
+    export AWS_SESSION_TOKEN=$(echo "${temporary_credentials}" | jq -re '.Credentials.SessionToken')
+    export AWS_SECURITY_TOKEN=$(echo "${temporary_credentials}" | jq -re '.Credentials.SessionToken')
+    export EC2_INI_PATH=$(pwd)/ec2.ini
+    export AWS_REGION="eu-central-1"
+}
+
+function assume_arole() {
+    export AWS_PROFILE=accounts
+    unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_SECURITY_TOKEN
+    echo "AWS_PROFILE=$AWS_PROFILE"
+    echo "Assuming role arn:aws:iam::${1}:role/${2}"
+    temporary_credentials=$(aws sts assume-role --role-arn="arn:aws:iam::${1}:role/${2}" --role-session-name="sh")
+
+    unset AWS_PROFILE AWS_DEFAULT_PROFILE
+
+    export AWS_ACCESS_KEY_ID=$(echo "${temporary_credentials}" | jq -re '.Credentials.AccessKeyId')
+    export AWS_SECRET_ACCESS_KEY=$(echo "${temporary_credentials}" | jq -re '.Credentials.SecretAccessKey')
+    export AWS_SESSION_TOKEN=$(echo "${temporary_credentials}" | jq -re '.Credentials.SessionToken')
+    export AWS_SECURITY_TOKEN=$(echo "${temporary_credentials}" | jq -re '.Credentials.SessionToken')
+    export EC2_INI_PATH=$(pwd)/ec2.ini
+    export AWS_REGION="eu-central-1"
+}
+
+function createRandomSession() {
+  export SESSION_ID=$(openssl rand -hex 7)
+  cp $HOME/.kube/config /tmp/kc-${SESSION_ID}
+  export KUBECONFIG=/tmp/kc-${SESSION_ID}
+}
+
+function url_decode() {
+    printf '%b\n' "$(sed -E -e 's/\+/ /g' -e 's/%([0-9a-fA-F]{2})/\\x\1/g')"
+}
+
+# export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
+export GRADLE_OPTS="-Xmx4g -Xms256m -Djava.awt.headless=true" # -XX:PermSize=256m -XX:MaxPermSize=256m"
+export MAVEN_OPTS="-Xmx2g -Djava.awt.headless=true"
+
+export GOPATH=~/gocode
+export PATH=$PATH:$GOPATH/bin
+export GOSUMDB="off" 
+export GOPRIVATE=gitlab.com/zestlabs-io
+export GRADLE_HOME=/usr/local/gradle
+export PATH=$PATH:$GRADLE_HOME/bin
+
+export PATH=/opt/local/bin:/opt/local/sbin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools:$MAVEN_HOME/bin:$PATH
+export PATH=~/bin:~/Dropbox/Scripts/path:/opt/local/bin:/opt/local/sbin:$PATH
+
+# Handle Mac platforms
+CPU=$(uname -p)
+if [[ "$CPU" == "arm" ]]; then
+    export PATH="/opt/homebrew/bin:$PATH"
+    alias oldbrew=/usr/local/bin/brew
+else
+    export PATH="/usr/local/bin:$PATH"
+fi
+
+alias k="kubectl"
+alias unset-aws="unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_SECURITY_TOKEN AWS_PROFILE AWS_DEFAULT_PROFILE"
+alias ssm="aws ssm start-session --target"
+
+# Set vim as default editor
+export VISUAL=vim
+export EDITOR="$VISUAL"
+export LANG=en_US.UTF-8
+
+## Aliases, local paths
+[[ ! -f $HOME/.localPaths.sh ]] || source $HOME/.localPaths.sh
+[[ ! -f $HOME/.aws-hon-alias ]] || source $HOME/.aws-hon-alias
+[[ ! -f $HOME/.aws-zest-alias ]] || source $HOME/.aws-zest-alias
+[[ ! -f $HOME/.aws-adventura-alias ]] || source $HOME/.aws-adventura-alias
+[[ ! -f $HOME/.aws-skincheck ]] || source $HOME/.aws-skincheck
+[[ ! -f $HOME/.tokens.sh ]] || source $HOME/.tokens.sh
+[[ ! -f $HOME/.docker.sh ]] || source $HOME/.docker.sh
+[[ ! -f $HOME/.macos.sh ]] || source $HOME/.macos.sh
+[[ ! -f $HOME/.linux.sh ]] || source $HOME/.linux.sh
+
+function set_prompt {
+  CRUNCH_BRACKET_COLOR="%{$fg[white]%}"
+  CRUNCH_TIME_COLOR="%{$fg[yellow]%}"
+  CRUNCH_RVM_COLOR="%{$fg[magenta]%}"
+  CRUNCH_DIR_COLOR="%{$fg[cyan]%}"
+  CRUNCH_GIT_BRANCH_COLOR="%{$fg[green]%}"
+  CRUNCH_GIT_CLEAN_COLOR="%{$fg[green]%}"
+  CRUNCH_GIT_DIRTY_COLOR="%{$fg[red]%}"
+  
+  # These Git variables are used by the oh-my-zsh git_prompt_info helper:
+  ZSH_THEME_GIT_PROMPT_PREFIX="$CRUNCH_BRACKET_COLOR:$CRUNCH_GIT_BRANCH_COLOR"
+  ZSH_THEME_GIT_PROMPT_SUFFIX=""
+  ZSH_THEME_GIT_PROMPT_CLEAN=" $CRUNCH_GIT_CLEAN_COLOR✓"
+  ZSH_THEME_GIT_PROMPT_DIRTY=" $CRUNCH_GIT_DIRTY_COLOR✗"
+  
+  # Our elements:
+  CRUNCH_TIME_="$CRUNCH_BRACKET_COLOR{$CRUNCH_TIME_COLOR%T$CRUNCH_BRACKET_COLOR}%{$reset_color%}"
+  #if [ -e ~/.rvm/bin/rvm-prompt ]; then
+  #  CRUNCH_RVM_="$CRUNCH_BRACKET_COLOR"["$CRUNCH_RVM_COLOR\${\$(~/.rvm/bin/rvm-prompt i v g)#ruby-}$CRUNCH_BRACKET_COLOR"]"%{$reset_color%}"
+  #else
+  #  if which rbenv &> /dev/null; then
+  #    CRUNCH_RVM_="$CRUNCH_BRACKET_COLOR"["$CRUNCH_RVM_COLOR\${\$(rbenv version | sed -e 's/ (set.*$//' -e 's/^ruby-//')}$CRUNCH_BRACKET_COLOR"]"%{$reset_color%}"
+  #  fi
+  #fi
+  CRUNCH_DIR_="$CRUNCH_DIR_COLOR%~\$(git_prompt_info) "
+  # CRUNCH_PROMPT="$CRUNCH_BRACKET_COLOR"$'\n'"➭﹩ "
+  CRUNCH_PROMPT="$CRUNCH_BRACKET_COLOR"$'\n'"$CRUNCH_GIT_DIRTY_COLOR> "
+  # CRUNCH_PROMPT="$CRUNCH_BRACKET_COLOR$CRUNCH_GIT_DIRTY_COLOR> "
+  
+  # Put it all together!
+  PROMPT="$CRUNCH_TIME_$CRUNCH_RVM_$CRUNCH_DIR_$CRUNCH_PROMPT%{$reset_color%}"
+  
+  source "/usr/local/opt/kube-ps1/share/kube-ps1.sh"
+  PROMPT='$(kube_ps1)'$PROMPT
+}
+# set_prompt
+# kubeoff
+# PROMPT='$(kube_ps1)'$PROMPT
+PROMPT='$(kube_ps1)[%{$fg[cyan]%}%c%{$reset_color%}] $(git_prompt_info)%(?:%{%}➜ :%{%}➜ )'
+kubeoff
+
+# FZF key bindings
+# source /usr/share/fzf/key-bindings.zsh
+# source /usr/share/fzf/completion.zsh
+
+# More aliases
+alias github-pnkv="cp ~/.ssh/config_pnkv ~/.ssh/config"
+alias github-npenkov="cp ~/.ssh/config_npenkov ~/.ssh/config"
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+[ -f ~/.cloud-secrets ] && source ~/.cloud-secrets
+[ -f ~/.podman.zsh ] && source ~/.podman.zsh
+[ -f ~/.docker-np-srv.zsh ] && source ~/.docker-np-srv.zsh
+
+alias vim-theme-dark="rm -rf $HOME/.vimrc-theme; ln -s $HOME/src/personal/dotfiles/.vimrc-theme-Dark $HOME/.vimrc-theme"
+alias vim-theme-light="rm -rf $HOME/.vimrc-theme; ln -s $HOME/src/personal/dotfiles/.vimrc-theme-Light $HOME/.vimrc-theme"
+alias vim-theme="rm -rf $HOME/.vimrc-theme; ln -s $HOME/src/personal/dotfiles/.vimrc-theme-$(defaults read -g AppleInterfaceStyle 2>/dev/null) $HOME/.vimrc-theme"
+# Added by serverless binary installer
+export PATH="$HOME/.serverless/bin:$PATH"
+
+
+export PATH="/usr/local/opt/libpq/bin:$PATH"
+
+jdk() {
+  version=$1
+  export JAVA_HOME=$(/usr/libexec/java_home -v"$version");
+  java -version
+}
+
+[ -f /usr/libexec/java_home ] && export JAVA_HOME=$(/usr/libexec/java_home -v"1.8");
+# source "/Users/nick/.sdkman/bin/sdkman-init.sh"
+
+# Kubernetes session per terminal
+createRandomSession
+
+# Enable Vim mode in ZSH
+# bindkey -v
+# 
+# autoload -U edit-command-line
+# zle -N edit-command-line
+bindkey '^E' edit-command-line                   # Opens Vim to edit current command line
+# bindkey '^R' history-incremental-search-backward # Perform backward search in command line history
+# bindkey '^S' history-incremental-search-forward  # Perform forward search in command line history
+# bindkey '^P' history-search-backward             # Go back/search in history (autocomplete)
+# bindkey '^N' history-search-forward              # Go forward/search in history (autocomplete)
+# autoload -U +X bashcompinit && bashcompinit
+# complete -o nospace -C /usr/local/bin/bit bit
+# autoload -U +X bashcompinit && bashcompinit
+# complete -o nospace -C /usr/local/bin/bit bit
+# bindkey '^R' fzf-history-widget
+
+alias shutdown-np-srv="ssh np-srv 'sudo shutdown -t 0'"
+alias shutdown-np-srv-u="ssh np-srv-u 'sudo shutdown -t 0'"
+alias shutdown-orin='ssh orin '\''sudo shutdown -t 0'\'
+
+# Rustlang
+if [[ -d $HOME/.cargo ]]; then
+  [ -f $HOME/.cargo/env ] && source $HOME/.cargo/env
+  export PATH=$PATH:$HOME/.cargo/bin
+fi
+
+# Docker aliases
+alias dps='docker ps -a --format="table {{.ID}}\t{{.Names}}\t{{.Command}}\t{{.Status}}"'
+
+# Scaleway CLI autocomplete initialization.
+# eval "$(scw autocomplete script shell=zsh)"
+
+############ SDKMAN
+#
+if [ -f $HOME/.sdkman/bin/sdkman-init.sh ]; then source $HOME/.sdkman/bin/sdkman-init.sh; fi
+
+########### NVM
+export NVM_DIR="$HOME/.nvm"
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
+[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+
+########### Ruby
+# source /opt/homebrew/opt/chruby/share/chruby/chruby.sh
+# source /opt/homebrew/opt/chruby/share/chruby/auto.sh
+# chruby ruby-2.7.4
+
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export PATH="$PATH:$HOME/.rvm/bin"
+source $(rvm 3.0.2 do rvm env --path)
+export OPENSSL_ROOT_DIR=/opt/homebrew/opt/openssl@3
+
+################## RUST GStreamer
+# export PKG_CONFIG_PATH="/Library/Frameworks/GStreamer.framework/Versions/1.0/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+# export PATH="/Library/Frameworks/GStreamer.framework/Versions/1.0/bin${PATH:+:$PATH}"
+# export GST_PLUGIN_PATH="/Library/Frameworks/GStreamer.framework/Versions/1.0"
+export GST_PLUGIN_PATH=/opt/homebrew/lib/gstreamer-1.0
+
+alias fluxw='flux get kustomizations --watch'
+
+## Use starship
+# eval "$(starship init zsh)"
+
+######## WebRTC and Google Toolchain
+export PATH=$HOME/src/oss/depot_tools:$PATH
+
+[ -f /opt/homebrew/bin/pyenv ] && PATH=$(pyenv root)/shims:$PATH

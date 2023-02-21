@@ -1,0 +1,78 @@
+[core]
+	excludesFile = ~/.gitignore
+	editor = vim
+	autocrlf = input
+	pager = "less -MR "
+[difftool "sourcetree"]
+	cmd = /usr/local/bin/vscode --diff $LOCAL $REMOTE
+	path = 
+[mergetool "sourcetree"]
+	cmd = /usr/local/bin/vscode $MERGED
+	trustExitCode = true
+[user]
+	name = Nick Penkov
+	email = nick.penkov@gmail.com
+[cola]
+	fontdiff = Lucida Console,11,-1,5,50,0,0,0,0,0
+	tabwidth = 4
+[gui]
+	editor = edit
+[diff]
+	tool = vimdiff
+[pager]
+    diff =
+[merge]
+	tool = vimdiff
+	conflictstyle = diff3
+[mergetool "diffmerge"]
+	cmd = "diffmerge --merge --result=\"$MERGED\" \"$LOCAL\" \"$(if test -f \"$BASE\"; then echo \"$BASE\"; else echo \"$LOCAL\"; fi)\" \"$REMOTE\""
+	trustExitCode = true
+[mergetool]
+	keepBackup = false
+	trustExitCode = true
+	prompt = false
+[difftool "diffmerge"]
+	cmd = diffmerge \"$LOCAL\" \"$REMOTE\"
+[color]
+	ui = true
+[alias]
+	st = status -s -b
+	di = diff
+	co = checkout
+	br = branch
+	l = log --oneline --decorate --graph
+	ll = log --pretty=format:'%C(cyan)%d%C(reset) %h | %C(green)%ad | %C(red)%an%C(auto,reset) | %s' --graph --date=short
+	timeline = log --graph --branches --pretty=oneline --decorate
+	untracked-files = ls-files -o --exclude-standard
+	ignored-files = ls-files --others -i --exclude-standard
+	modified-files = ls-files -m
+	ra = remote add
+	rr = remote remove
+	cm = commit -m
+	cam = commit -am
+	up = log --branches --not --remotes --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) (bold blue)<%an %Creset' --abbrev-commit
+	smr = submodule foreach --recursive 
+	d = difftool
+	squash-all = "!f(){ git reset $(git commit-tree HEAD^{tree} -m \"${1:-A new start}\");};f"
+[push]
+	default = simple
+[difftool]
+	prompt = false
+	trustExitCode = true
+[commit]
+	template = /Users/npenkov/.stCommitMsg
+[pull]
+	rebase = true
+[credential]
+	helper = osxkeychain
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[url "git@gitlab.com:"]
+	insteadOf = https://gitlab.com
+[github]
+	user = npenkov
+[init]
+	defaultBranch = main

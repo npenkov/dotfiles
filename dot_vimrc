@@ -1,0 +1,267 @@
+"  brew install vim
+"  rm -rf .vim .vimrc .viminfo
+"  
+"  mkdir -p ~/.vim/autoload ~/.vim/bundle && \
+"      curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+" 
+"  curl -fLo ~/.vim/autoload/plug.vim \
+"       --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+"
+"  git clone https://github.com/scrooloose/nerdtree.git ~/.vim/bundle/nerdtree
+"
+" VUNDLE
+"  git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+"
+" 
+" Then copy this file to ~/.vimrc
+" Start VIM and type PlugInstall
+" And last install the code assistance
+" :CocInstall coc-tsserver coc-html coc-css coc-python coc-go
+" --------------------------------------------
+" Solirized theme - https://github.com/altercation/vim-colors-solarized
+"
+" git clone git@github.com:altercation/vim-colors-solarized.git
+" cd vim-colors-solarized
+" mv solarized.vim ~/.vim/colors/
+" --------------------------------------------
+
+" Pathogen
+execute pathogen#infect()
+
+" Enable syntax highlighting
+syntax on
+
+" Indent plugin code
+filetype plugin indent on
+
+" =========================  Set shortcut for NERD Tree
+map <C-t> :NERDTreeToggle<CR>
+map <C-y> :NERDTreeFind<CR>
+
+let NERDTreeShowHidden=1
+" ====================================== 
+
+" Show line numbers
+set number
+
+" Substitute tabs with 4 spaces
+set tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
+
+" Always display status line
+set laststatus=2
+
+set autowrite
+
+" make backspace work like most other apps
+set backspace=2 
+
+" Copy/paste to system clipboard
+set clipboard=unnamed
+
+" Don't create swap files
+set noswapfile
+
+" Disable folding
+set nofoldenable
+
+" ============== Plug ================
+call plug#begin()
+Plug 'preservim/nerdtree'
+Plug 'fatih/molokai'
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+Plug 'pearofducks/ansible-vim'
+Plug 'hashivim/vim-terraform'
+Plug 'vim-syntastic/syntastic'
+Plug 'juliosueiras/vim-terraform-completion'
+Plug 'iamcco/markdown-preview.nvim',  { 'do': 'cd app & yarn install' }
+Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
+Plug 'jparise/vim-graphql'
+Plug 'sonph/onehalf', {'rtp': 'vim/'}
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+" Type script
+Plug 'pangloss/vim-javascript'    " JavaScript support
+Plug 'leafgarland/typescript-vim' " TypeScript syntax
+Plug 'maxmellon/vim-jsx-pretty'   " JS and JSX syntax
+Plug 'neoclide/coc.nvim' , { 'branch' : 'release' }
+" Silver searcher
+" Plug 'rking/ag.vim'
+" Coloring for brackets
+Plug 'chrisbra/colorizer'
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'prettier/vim-prettier', {
+  \ 'do': 'yarn install',
+  \ 'branch': 'release/0.x'
+  \ }
+Plug 'junegunn/vim-github-dashboard'
+Plug 'NLKNguyen/papercolor-theme'
+Plug 'evanleck/vim-svelte'
+Plug 'pangloss/vim-javascript'
+Plug 'HerringtonDarkholme/yats.vim'
+Plug 'codechips/coc-svelte', {'do': 'npm install'}
+Plug 'rust-lang/rust.vim'
+call plug#end()
+
+" ================= Vundle =========== 
+call vundle#begin()
+Plugin 'mileszs/ack.vim'
+Plugin 'vim-scripts/indentpython.vim'
+Plugin 'vim-syntastic/syntastic'
+Plugin 'nvie/vim-flake8'
+Plugin 'colors/onedark.vim'
+Plugin 'mattn/webapi-vim'
+Plugin 'mattn/vim-gist'
+call vundle#end()
+
+" ============== Customize theme =====
+let g:rehash256 = 1
+let g:molokai_original = 1
+
+" colorscheme molokai
+" colorscheme osx_like
+" git clone https://github.com/flazz/vim-colorschemes.git ~/.vim
+" cp colors/* ~/.vim/colors
+source $HOME/.vimrc-theme
+" https://github.com/vim-scripts/Solarized
+" set background=dark
+" colorscheme solarized
+" in your .vimrc or init.vim
+" colorscheme github
+
+" if you use airline / lightline
+
+" ============== VIM-GO Cust =========
+let g:go_fmt_command = "goimports"
+
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_types = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_build_constraints = 1
+let g:go_highlight_function_calls = 1
+let g:go_highlight_extra_types = 1
+
+let g:go_auto_type_info = 1 " Automatically get signature/type info for object under cursor
+" let g:go_auto_type_info = 0
+
+" let g:go_bin_path = '$HOME/gopath/bin'
+
+map <C-n> :cnext<CR>
+map <C-m> :cprevious<CR>
+nnoremap <leader>a :cclose<CR>
+autocmd FileType go nmap <Leader>i <Plug>(go-info)
+
+au filetype go inoremap <buffer> . .<C-x><C-o>
+autocmd FileType go nmap <leader>b  <Plug>(go-build)
+autocmd FileType go nmap <leader>r  <Plug>(go-run)
+autocmd FileType go nmap <leader>t  <Plug>(go-test)
+
+" ============= Java plugin https://github.com/artur-shaik/vim-javacomplete2
+autocmd FileType java setlocal omnifunc=javacomplete#Complete
+
+nmap <F4> <Plug>(JavaComplete-Imports-AddSmart)
+imap <F4> <Plug>(JavaComplete-Imports-AddSmart)
+
+nmap <F5> <Plug>(JavaComplete-Imports-Add)
+imap <F5> <Plug>(JavaComplete-Imports-Add)
+
+nmap <F6> <Plug>(JavaComplete-Imports-AddMissing)
+imap <F6> <Plug>(JavaComplete-Imports-AddMissing)
+
+nmap <F7> <Plug>(JavaComplete-Imports-RemoveUnused)
+imap <F7> <Plug>(JavaComplete-Imports-RemoveUnused)
+
+" ============= Terraform
+" Syntastic Config
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+
+" (Optional)Remove Info(Preview) window
+set completeopt-=preview
+
+" (Optional)Hide Info(Preview) window after completions
+autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
+autocmd InsertLeave * if pumvisible() == 0|pclose|endif
+
+" ===================== Terraform ==================
+" (Optional) Enable terraform plan to be include in filter
+let g:syntastic_terraform_tffilter_plan = 1
+let g:terraform_align=1
+let g:terraform_fold_sections=1
+let g:terraform_fmt_on_save=1
+
+autocmd FileType terraform setlocal commentstring=#%s
+set runtimepath^=~/.vim/bundle/ctrlp.vim
+
+" =============== Javascript and Typescript ==========
+autocmd BufEnter *.{js,jsx,ts,tsx} :syntax sync fromstart
+autocmd BufLeave *.{js,jsx,ts,tsx} :syntax sync clear
+            
+autocmd FileType yaml setlocal shiftwidth=2 softtabstop=2 expandtab
+autocmd FileType js setlocal shiftwidth=2 softtabstop=2 expandtab
+autocmd FileType jsx setlocal shiftwidth=2 softtabstop=2 expandtab
+autocmd FileType go setlocal shiftwidth=2 softtabstop=2 expandtab
+autocmd FileType typescript setlocal shiftwidth=2 softtabstop=2 expandtab
+autocmd FileType tsx setlocal shiftwidth=2 softtabstop=2 expandtab
+
+" ================ Markdown preview ==================
+let vim_markdown_preview_github=1
+
+" Enable true color so that works under TMUX
+if exists('+termguicolors')
+  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+  set termguicolors
+endif
+
+" ============ Typescript COC server
+let g:coc_global_extensions = [ 'coc-tsserver' ]
+" Remap keys for applying codeAction to the current line.
+nmap <leader>ac  <Plug>(coc-codeaction)
+" " Apply AutoFix to problem on the current line.
+nmap <leader>qf  <Plug>(coc-fix-current)
+" Show autocomplete when Tab is pressed
+inoremap <silent><expr> <C-n> coc#refresh()
+"
+"
+" " GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" FZF Mapping
+nnoremap <C-p> :Files<Cr>
+" Always enable preview window on the right with 60% width
+let g:fzf_preview_window = 'right:60%'
+
+" =========== Map leader key
+let mapleader=","
+
+" ======== Python
+au BufNewFile,BufRead *.py set tabstop=4 softtabstop=4 shiftwidth=4 textwidth=79 expandtab autoindent fileformat=unix
+set encoding=utf-8
+"python with virtualenv support
+" py << EOF
+" import os
+" import sys
+" if 'VIRTUAL_ENV' in os.environ:
+"   project_base_dir = os.environ['VIRTUAL_ENV']
+"   activate_this = os.path.join(project_base_dir, 'bin/activate_this.py')
+"   execfile(activate_this, dict(__file__=activate_this))
+" EOF
+
+let python_highlight_all=1
+let NERDTreeIgnore=['\.pyc$', '\~$'] "ignore files in NERDTree
+
+
+let g:gist_use_password_in_gitconfig = 1
