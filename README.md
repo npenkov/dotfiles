@@ -30,3 +30,8 @@ sh -c "$(curl -fsLS get.chezmoi.io)"
 chezmoi init --apply --verbose https://github.com/npenkov/dotfiles.git
 ```
 
+if the decryption fails - use:
+
+```sh
+age --decrypt --output "${HOME}/key.txt" "$HOME/.local/share/chezmoi/key.txt.age"
+```
