@@ -1,10 +1,4 @@
-"" colorscheme onehalflight
-" set t_Co=256   " This is may or may not needed.
-
-" set background=light
-" colorscheme PaperColor
 syntax enable
 set background=light
-" colorscheme solarized
 colorscheme onedark
 
