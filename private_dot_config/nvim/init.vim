@@ -34,11 +34,7 @@ syntax on
 " Indent plugin code
 filetype plugin indent on
 
-" =========================  Set shortcut for NERD Tree
-map <C-t> :NERDTreeToggle<CR>
-map <C-y> :NERDTreeFind<CR>
 
-let NERDTreeShowHidden=1
 " ====================================== 
 
 " Show line numbers
@@ -66,7 +62,7 @@ set nofoldenable
 
 " ============== Plug ================
 call plug#begin()
-Plug 'preservim/nerdtree'
+"Plug 'preservim/nerdtree'
 "Plug 'fatih/molokai'
 "Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'iamcco/markdown-preview.nvim',  { 'do': 'cd app & yarn install' }
@@ -80,13 +76,27 @@ Plug 'rust-lang/rust.vim'
 Plug 'navarasu/onedark.nvim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'dyng/ctrlsf.vim'
+" Tabs
+Plug 'nvim-tree/nvim-web-devicons'
+Plug 'romgrk/barbar.nvim'
+Plug 'nvim-tree/nvim-web-devicons' " optional, for file icons
+Plug 'nvim-tree/nvim-tree.lua'
 call plug#end()
 
 " ================= Vundle =========== 
 call vundle#begin()
 Plugin 'mileszs/ack.vim'
 Plugin 'vim-scripts/indentpython.vim'
+Plugin 'vim-autoformat/vim-autoformat'
+Plugin 'tpope/vim-fugitive'
+" NERDTree Icons
+"Plugin 'ryanoasis/vim-devicons'
 call vundle#end()
+
+" ============== NVIM-TREE ===========
+lua require 'nvim-tree'.setup()
+map <C-t> :NvimTreeToggle<CR>
+map <C-y> :NvimTreeFindFile<CR>
 
 " ============== Customize theme =====
 let g:rehash256 = 1
@@ -104,6 +114,18 @@ source $HOME/.vimrc-theme
 " colorscheme github
 
 " if you use airline / lightline
+
+" =========================  Set shortcut for NERD Tree
+"map <C-t> :NERDTreeToggle<CR>
+"map <C-y> :NERDTreeFind<CR>
+"let NERDTreeShowHidden=1
+" Set Vim font to a Nerd Font
+set guifont=DroidSansMono_Nerd_Font:h11
+
+" ========== Enable WebDEVIcons
+"let g:webdevicons_enable = 1
+" adding the flags to NERDTree
+"let g:webdevicons_enable_nerdtree = 1
 
 " ============== VIM-GO Cust =========
 let g:go_fmt_command = "goimports"
@@ -151,7 +173,8 @@ nmap <silent> gr <Plug>(coc-references)
 
 " May need for Vim (not Neovim) since coc.nvim calculates byte offset by count
 " utf-8 byte sequence
-set encoding=utf-8
+" set encoding=utf-8
+set encoding=UTF-8
 " Some servers have issues with backup files, see #649
 set nobackup
 set nowritebackup
@@ -340,6 +363,53 @@ let NERDTreeIgnore=['\.pyc$', '\~$'] "ignore files in NERDTree
 " ======== GIST
 let g:gist_use_password_in_gitconfig = 1
 
-" ======== CLangComplete
-let g:clang_library_path='/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain//usr/lib/libclang.dylib'
+" ======== Barbar Tabs
+" Move to previous/next
+nnoremap <silent>    <C-,> <Cmd>BufferPrevious<CR>
+nnoremap <silent>    <C-.> <Cmd>BufferNext<CR>
 
+"" Re-order to previous/next
+"nnoremap <silent>    <A-<> <Cmd>BufferMovePrevious<CR>
+"nnoremap <silent>    <A->> <Cmd>BufferMoveNext<CR>
+"
+"" Goto buffer in position...
+"nnoremap <silent>    <A-1> <Cmd>BufferGoto 1<CR>
+"nnoremap <silent>    <A-2> <Cmd>BufferGoto 2<CR>
+"nnoremap <silent>    <A-3> <Cmd>BufferGoto 3<CR>
+"nnoremap <silent>    <A-4> <Cmd>BufferGoto 4<CR>
+"nnoremap <silent>    <A-5> <Cmd>BufferGoto 5<CR>
+"nnoremap <silent>    <A-6> <Cmd>BufferGoto 6<CR>
+"nnoremap <silent>    <A-7> <Cmd>BufferGoto 7<CR>
+"nnoremap <silent>    <A-8> <Cmd>BufferGoto 8<CR>
+"nnoremap <silent>    <A-9> <Cmd>BufferGoto 9<CR>
+"nnoremap <silent>    <A-0> <Cmd>BufferLast<CR>
+"
+"" Pin/unpin buffer
+"nnoremap <silent>    <A-p> <Cmd>BufferPin<CR>
+"
+"" Close buffer
+"nnoremap <silent>    <A-c> <Cmd>BufferClose<CR>
+"
+"" Wipeout buffer
+""                          :BufferWipeout
+"" Close commands
+""                          :BufferCloseAllButCurrent
+""                          :BufferCloseAllButVisible
+""                          :BufferCloseAllButPinned
+""                          :BufferCloseAllButCurrentOrPinned
+""                          :BufferCloseBuffersLeft
+""                          :BufferCloseBuffersRight
+"
+"" Magic buffer-picking mode
+"nnoremap <silent> <C-p>    <Cmd>BufferPick<CR>
+"nnoremap <silent> <C-p>    <Cmd>BufferPickDelete<CR>
+"
+"" Sort automatically by...
+"nnoremap <silent> <Space>bb <Cmd>BufferOrderByBufferNumber<CR>
+"nnoremap <silent> <Space>bd <Cmd>BufferOrderByDirectory<CR>
+"nnoremap <silent> <Space>bl <Cmd>BufferOrderByLanguage<CR>
+"nnoremap <silent> <Space>bw <Cmd>BufferOrderByWindowNumber<CR>
+"
+"" Other:
+"" :BarbarEnable - enables barbar (enabled by default)
+"" :BarbarDisable - very bad command, should never be used
